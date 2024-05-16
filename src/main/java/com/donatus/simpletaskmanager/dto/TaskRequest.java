@@ -29,4 +29,7 @@ public class TaskRequest {
     @NotBlank(message = "Task title should not be empty!")
     private String taskTitle;
     private String taskDetails;
+    private Long userId;
+    private String firstName;
+    private String lastName;
 }

@@ -13,11 +13,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "user_table")
-public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class UserEntity extends BaseEntity {
     @Column(nullable = false,length = 35)
     private String firstName;
 
@@ -43,6 +39,7 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Roles roles;
 

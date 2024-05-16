@@ -32,7 +32,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
 
         String token = getJWTFromRequest(request);
-        log.info("Token received is {}", token);
 
         if (StringUtils.hasText(token) && tokenGenerator.validateToken(token)
                 && SecurityContextHolder.getContext().getAuthentication() == null){

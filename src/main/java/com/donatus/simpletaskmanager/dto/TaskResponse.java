@@ -1,6 +1,7 @@
 package com.donatus.simpletaskmanager.dto;
 
 import com.donatus.simpletaskmanager.models.TaskStatus;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,9 +18,12 @@ import java.sql.Timestamp;
 @Setter
 public class TaskResponse {
     private Long id;
+    private Long userId;
     private Integer periodInDays;
     private Timestamp startDate;
     private TaskStatus status;
     private String taskTitle;
     private String taskDetails;
+    private String createdBy;
+    private String assignBy;
 }
