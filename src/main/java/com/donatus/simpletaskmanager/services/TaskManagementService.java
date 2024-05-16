@@ -19,8 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -136,7 +134,7 @@ public class TaskManagementService {
                     return taskResponse;
                 })
                 .toList());
-        paginatedResponse.setPageNo(pagedTasks.getNumber());
+        paginatedResponse.setPageNum(pagedTasks.getNumber());
         paginatedResponse.setPageSize(pagedTasks.getSize());
         paginatedResponse.setLast(pagedTasks.isLast());
         paginatedResponse.setTotalElement(pagedTasks.getNumberOfElements());
