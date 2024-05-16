@@ -39,4 +39,9 @@ public class TaskController {
                                                                 @RequestParam("taskId") Long taskId){
         return taskService.updateTask(taskRequest, taskId);
     }
+
+    @DeleteMapping("/tasks")
+    public ResponseEntity<ApiResponse<TaskResponse>> DeleteTask(@RequestParam("taskId") Long taskId){
+        return taskService.deleteTaskById(taskId);
+    }
 }

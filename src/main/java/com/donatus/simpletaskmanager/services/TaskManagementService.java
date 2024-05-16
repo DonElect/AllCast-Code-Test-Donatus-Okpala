@@ -165,4 +165,12 @@ public class TaskManagementService {
         response.setResponseData(mapper.map(updatedTask, TaskResponse.class));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<ApiResponse<TaskResponse>> deleteTaskById(Long taskId){
+        taskRepo.deleteById(taskId);
+
+        response.setCode("202");
+        response.setDescription("Successful");
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
 }
