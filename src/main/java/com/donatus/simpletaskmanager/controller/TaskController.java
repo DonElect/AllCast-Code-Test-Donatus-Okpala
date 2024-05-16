@@ -47,4 +47,10 @@ public class TaskController {
     public ResponseEntity<ApiResponse<TaskResponse>> assignTask(@Valid @RequestBody AssignTaskRequest taskRequest){
         return taskService.assignTaskToUser(taskRequest);
     }
+
+    @PutMapping("/task_status")
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTaskStatus(@RequestParam("status") String status,
+            @RequestParam("taskId") Long taskId){
+        return taskService.updateTaskStatus(status, taskId);
+    }
 }

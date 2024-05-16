@@ -4,6 +4,7 @@ import com.donatus.simpletaskmanager.dto.*;
 import com.donatus.simpletaskmanager.exception.GenericException;
 import com.donatus.simpletaskmanager.exception.UserNotFoundException;
 import com.donatus.simpletaskmanager.models.TaskEntity;
+import com.donatus.simpletaskmanager.models.TaskStatus;
 import com.donatus.simpletaskmanager.models.UserEntity;
 import com.donatus.simpletaskmanager.repository.TaskRepository;
 import com.donatus.simpletaskmanager.repository.UserRepository;
@@ -195,5 +196,16 @@ public class TaskManagementService {
         response.setResponseData(taskResponse);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTaskStatus(String status, Long taskId){
+        TaskEntity task = taskRepo.findTaskEntityById(taskId)
+                .orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Invalid task id", "Check task id and try again"));
+
+        task.setStatus(TaskStatus.valueOf(status.toUpperCase()));
+
+        TaskEntity updatedTask = taskRepo.save(task);
+
+        return getApiTaskResponse(updatedTask.getUser(), updatedTask);
     }
 }
