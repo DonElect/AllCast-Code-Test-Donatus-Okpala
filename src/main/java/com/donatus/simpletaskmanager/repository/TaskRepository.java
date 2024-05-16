@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 
 @Repository
-public interface TaskEntityRepository extends JpaRepository<TaskEntity, Long> {
+public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
+    @Query(value = "SELECT t FROM TaskEntity t ORDER BY t.dateModified")
+    Slice<TaskEntity> pageAllTask(Pageable pageable);
     Slice<TaskEntity> findByUserId(Long user_id, Pageable pageable);
     Slice<TaskEntity> findByStatusAndUserId(TaskStatus status, Long user_id, Pageable pageable);
     Slice<TaskEntity> findByStatus(TaskStatus status, Pageable pageable);

@@ -31,10 +31,12 @@ public class TaskEntity extends BaseEntity{
     private String taskDetails;
 
     @Column(nullable = false)
+    private String createdBy;
+
     private String assignBy;
 
     @ManyToOne(cascade = {CascadeType.DETACH,CascadeType.MERGE
-            ,CascadeType.PERSIST,CascadeType.REFRESH})
+            ,CascadeType.PERSIST,CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 }
