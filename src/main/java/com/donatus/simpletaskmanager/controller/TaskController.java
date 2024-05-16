@@ -17,12 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/task-mgmt/tasks")
 @RequiredArgsConstructor
 public class TaskController {
-//    String email = SecurityContextHolder.getContext().getAuthentication().getName();
     private final TaskManagementService taskService;
 
-    @PostMapping("")
+    @PostMapping("/create_assign")
     public ResponseEntity<ApiResponse<TaskEntity>> createAndAssignTask(@Valid @RequestBody TaskRequest taskRequest){
         return taskService.createNewTaskAndAssignToUser(taskRequest);
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<TaskEntity>> createTaskOnly(@Valid @RequestBody TaskRequest taskRequest){
+        return taskService.createNewTaskOnly(taskRequest);
+    }
 }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class TaskManagementService {
     private final TaskEntityRepository taskRepo;
     private final UserRepository userRepo;
+    ApiResponse<TaskEntity> response = new ApiResponse<>();
 
     public ResponseEntity<ApiResponse<TaskEntity>> createNewTaskAndAssignToUser(TaskRequest taskRequest){
         if(taskRequest.getFirstName() == null || taskRequest.getLastName() == null){
@@ -31,7 +33,11 @@ public class TaskManagementService {
         UserEntity user = userRepo.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(taskRequest.getFirstName(), taskRequest.getLastName())
                 .orElseThrow(()-> new UserNotFoundException("User does not exist!"));
 
-        ApiResponse<TaskEntity> response = new ApiResponse<>();
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserEntity admin = userRepo.findUserEntityByEmail(email)
+                .orElseThrow(()-> new UserNotFoundException("User does not exist!"));
+
         try{
             TaskEntity newTask = TaskEntity.builder()
                     .taskTitle(taskRequest.getTaskTitle())
@@ -39,12 +45,40 @@ public class TaskManagementService {
                     .periodInDays(taskRequest.getPeriodInDays())
                     .startDate(taskRequest.getStartDate())
                     .status(taskRequest.getStatus())
+                    .assignBy(admin.getEmail())
                     .user(user)
                     .build();
 
             TaskEntity savedTask =  taskRepo.save(newTask);
 
             savedTask.setUser(null);
+
+            response.setCode("201");
+            response.setDescription("Successful");
+            response.setResponseData(savedTask);
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (Exception ex){
+            log.error("Failed to create task: ", ex);
+            response.setCode("500");
+            response.setDescription("Failed to create task");
+            response.setResponseData(null);
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<ApiResponse<TaskEntity>> createNewTaskOnly(TaskRequest taskRequest){
+        try{
+            TaskEntity newTask = TaskEntity.builder()
+                    .taskTitle(taskRequest.getTaskTitle())
+                    .taskDetails(taskRequest.getTaskDetails())
+                    .periodInDays(taskRequest.getPeriodInDays())
+                    .startDate(taskRequest.getStartDate())
+                    .status(taskRequest.getStatus())
+                    .build();
+
+            TaskEntity savedTask =  taskRepo.save(newTask);
 
             response.setCode("201");
             response.setDescription("Successful");

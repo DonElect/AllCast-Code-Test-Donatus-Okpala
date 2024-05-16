@@ -13,11 +13,7 @@ import java.sql.Timestamp;
 @Builder
 @Entity
 @Table(name = "task_table")
-public class TaskEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class TaskEntity extends BaseEntity{
     private Integer periodInDays;
 
     @Column(nullable = false)
@@ -33,6 +29,9 @@ public class TaskEntity {
 
     @Column(length = 1000)
     private String taskDetails;
+
+    @Column(nullable = false)
+    private String assignBy;
 
     @ManyToOne(cascade = {CascadeType.DETACH,CascadeType.MERGE
             ,CascadeType.PERSIST,CascadeType.REFRESH})
