@@ -19,12 +19,12 @@ public class TaskController {
     private final TaskManagementService taskService;
 
     @PostMapping("/tasks_assign")
-    public ResponseEntity<ApiResponse<TaskEntity>> createAndAssignTask(@Valid @RequestBody TaskRequest taskRequest){
+    public ResponseEntity<ApiResponse<TaskResponse>> createAndAssignTask(@Valid @RequestBody TaskRequest taskRequest){
         return taskService.createNewTaskAndAssignToUser(taskRequest);
     }
 
     @PostMapping("/tasks")
-    public ResponseEntity<ApiResponse<TaskEntity>> createTaskOnly(@Valid @RequestBody TaskRequest taskRequest){
+    public ResponseEntity<ApiResponse<TaskResponse>> createTaskOnly(@Valid @RequestBody TaskRequest taskRequest){
         return taskService.createNewTaskOnly(taskRequest);
     }
 
@@ -32,5 +32,11 @@ public class TaskController {
     public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> createAndAssignTask(@RequestParam("pageNum") int pageNum,
                                                                                             @RequestParam("pageSize") int pageSize){
         return taskService.getTasksByPage(pageNum, pageSize);
+    }
+
+    @PutMapping("/tasks")
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@Valid @RequestBody TaskRequest taskRequest,
+                                                                @RequestParam("taskId") Long taskId){
+        return taskService.updateTask(taskRequest, taskId);
     }
 }
