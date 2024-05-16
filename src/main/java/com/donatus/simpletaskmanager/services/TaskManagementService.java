@@ -1,9 +1,6 @@
 package com.donatus.simpletaskmanager.services;
 
-import com.donatus.simpletaskmanager.dto.ApiResponse;
-import com.donatus.simpletaskmanager.dto.PaginatedResponse;
-import com.donatus.simpletaskmanager.dto.TaskRequest;
-import com.donatus.simpletaskmanager.dto.TaskResponse;
+import com.donatus.simpletaskmanager.dto.*;
 import com.donatus.simpletaskmanager.exception.GenericException;
 import com.donatus.simpletaskmanager.exception.UserNotFoundException;
 import com.donatus.simpletaskmanager.models.TaskEntity;
@@ -62,7 +59,12 @@ public class TaskManagementService {
 
             response.setCode("201");
             response.setDescription("Successful");
-            response.setResponseData(mapper.map(savedTask, TaskResponse.class));
+            TaskResponse taskResponse = mapper.map(savedTask, TaskResponse.class);
+
+            taskResponse.setFirstName(user.getFirstName());
+            taskResponse.setLastName(user.getLastName());
+            taskResponse.setEmail(user.getEmail());
+            response.setResponseData(taskResponse);
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception ex) {
@@ -123,7 +125,15 @@ public class TaskManagementService {
             return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
         }
         paginatedResponse.setContent(pagedTasks.stream()
-                .map(taskEntity -> mapper.map(taskEntity, TaskResponse.class))
+                .map(taskEntity -> {
+                    TaskResponse taskResponse = mapper.map(taskEntity, TaskResponse.class);
+
+                    taskResponse.setFirstName(taskEntity.getUser().getFirstName());
+                    taskResponse.setLastName(taskEntity.getUser().getLastName());
+                    taskResponse.setEmail(taskEntity.getUser().getEmail());
+
+                    return taskResponse;
+                })
                 .toList());
         paginatedResponse.setPageNo(pagedTasks.getNumber());
         paginatedResponse.setPageSize(pagedTasks.getSize());
@@ -149,21 +159,7 @@ public class TaskManagementService {
         task.setTaskTitle(taskRequest.getTaskTitle());
         task.setTaskDetails(taskRequest.getTaskDetails());
 
-        if (taskRequest.getFirstName() != null && taskRequest.getLastName() != null) {
-            UserEntity userEntity = userRepo.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(taskRequest.getFirstName(), taskRequest.getLastName())
-                    .orElseThrow(() -> new UserNotFoundException("User with name: " + taskRequest.getFirstName() + " " + taskRequest.getLastName() + " not found"));
-
-            task.setUser(userEntity);
-        } else if (user != null) {
-            task.setUser(user);
-        }
-
-        TaskEntity updatedTask = taskRepo.save(task);
-
-        response.setCode("200");
-        response.setDescription("Successful");
-        response.setResponseData(mapper.map(updatedTask, TaskResponse.class));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return getApiTaskResponse(user, task);
     }
 
     public ResponseEntity<ApiResponse<TaskResponse>> deleteTaskById(Long taskId){
@@ -172,5 +168,32 @@ public class TaskManagementService {
         response.setCode("202");
         response.setDescription("Successful");
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+    public ResponseEntity<ApiResponse<TaskResponse>> assignTaskToUser(AssignTaskRequest taskRequest){
+        UserEntity user = userRepo.findByFirstNameIgnoreCaseAndLastNameIgnoreCaseOrEmail(taskRequest.getFirstName(),
+                        taskRequest.getLastName(), taskRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User does not exist!"));
+
+        TaskEntity task = taskRepo.findTaskEntityById(taskRequest.getTaskId())
+                .orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Invalid task id", "Check task id and try again"));
+
+        task.setUser(user);
+        return getApiTaskResponse(user, task);
+    }
+
+    private ResponseEntity<ApiResponse<TaskResponse>> getApiTaskResponse(UserEntity user, TaskEntity task) {
+        TaskEntity savedTask = taskRepo.save(task);
+
+        response.setCode("200");
+        response.setDescription("Successful");
+        TaskResponse taskResponse = mapper.map(savedTask, TaskResponse.class);
+
+        taskResponse.setFirstName(user.getFirstName());
+        taskResponse.setLastName(user.getLastName());
+        taskResponse.setEmail(user.getEmail());
+        response.setResponseData(taskResponse);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
