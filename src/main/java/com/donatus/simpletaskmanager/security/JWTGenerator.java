@@ -1,5 +1,6 @@
 package com.donatus.simpletaskmanager.security;
 
+import com.donatus.simpletaskmanager.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

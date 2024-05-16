@@ -37,14 +37,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        http.exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(configure ->
                 configure
                         .requestMatchers(antMatcher(HttpMethod.GET, "/health")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/user-mgmt/**")).permitAll()
-//                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/user-mgmt/login")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/profile/**")).hasAnyAuthority("USER", "DRIVER", "ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/task-mgmt/tasks/**")).hasAnyAuthority("ADMIN")
                         .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/profile/**")).hasAnyAuthority("USER", "DRIVER", "ADMIN")
                         .anyRequest().authenticated());
         http.httpBasic(HttpBasicConfigurer::disable);

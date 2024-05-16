@@ -15,6 +15,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(GenericException.class)
+    public ResponseEntity<ApiResponse<ErrorDetail>> handleGenericExceptions(final GenericException exception){
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .message(exception.getMessage())
+                .status(exception.getStatusCode())
+                .debugMessage(exception.getDebugMessage())
+                .build();
+        ApiResponse<ErrorDetail> response = new ApiResponse<>("401", exception.getMessage(), errorDetail);
+        return new ResponseEntity<>(response, exception.getStatusCode());
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse<ErrorDetail>> handleUnauthorizedException(final UnauthorizedException exception){
         ErrorDetail errorDetail = ErrorDetail.builder()
@@ -74,7 +85,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<ErrorDetail>> handleTokenExpirationException(final TokenExpirationException exception){
         ErrorDetail errorDetail = ErrorDetail.builder()
                 .message(exception.getMessage())
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.UNAUTHORIZED)
                 .debugMessage("Please ask for a new link.")
                 .build();
         ApiResponse<ErrorDetail> response = new ApiResponse<>("401", exception.getMessage(), errorDetail);
