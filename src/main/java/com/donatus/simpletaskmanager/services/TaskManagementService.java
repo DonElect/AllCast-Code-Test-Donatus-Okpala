@@ -30,10 +30,10 @@ public class TaskManagementService {
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final ModelMapper mapper = new ModelMapper();
-    ApiResponse<TaskEntity> response = new ApiResponse<>();
+    ApiResponse<TaskResponse> response = new ApiResponse<>();
     ApiResponse<PaginatedResponse<TaskResponse>> paginatedApiResponse = new ApiResponse<>();
 
-    public ResponseEntity<ApiResponse<TaskEntity>> createNewTaskAndAssignToUser(TaskRequest taskRequest) {
+    public ResponseEntity<ApiResponse<TaskResponse>> createNewTaskAndAssignToUser(TaskRequest taskRequest) {
         if (taskRequest.getFirstName() == null || taskRequest.getLastName() == null) {
             throw new GenericException(HttpStatus.BAD_REQUEST, "First name and last name is required", "Input first and last name an try again.");
         }
@@ -60,11 +60,9 @@ public class TaskManagementService {
 
             TaskEntity savedTask = taskRepo.save(newTask);
 
-            savedTask.setUser(null);
-
             response.setCode("201");
             response.setDescription("Successful");
-            response.setResponseData(savedTask);
+            response.setResponseData(mapper.map(savedTask, TaskResponse.class));
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception ex) {
@@ -77,7 +75,7 @@ public class TaskManagementService {
         }
     }
 
-    public ResponseEntity<ApiResponse<TaskEntity>> createNewTaskOnly(TaskRequest taskRequest) {
+    public ResponseEntity<ApiResponse<TaskResponse>> createNewTaskOnly(TaskRequest taskRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserEntity admin = userRepo.findUserEntityByEmail(email)
@@ -97,7 +95,7 @@ public class TaskManagementService {
 
             response.setCode("201");
             response.setDescription("Successful");
-            response.setResponseData(savedTask);
+            response.setResponseData(mapper.map(savedTask, TaskResponse.class));
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception ex) {
@@ -125,8 +123,8 @@ public class TaskManagementService {
             return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
         }
         paginatedResponse.setContent(pagedTasks.stream()
-                        .map(taskEntity -> mapper.map(taskEntity, TaskResponse.class))
-                        .toList());
+                .map(taskEntity -> mapper.map(taskEntity, TaskResponse.class))
+                .toList());
         paginatedResponse.setPageNo(pagedTasks.getNumber());
         paginatedResponse.setPageSize(pagedTasks.getSize());
         paginatedResponse.setLast(pagedTasks.isLast());
@@ -137,5 +135,34 @@ public class TaskManagementService {
         paginatedApiResponse.setResponseData(paginatedResponse);
 
         return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(TaskRequest taskRequest, Long taskId) {
+        TaskEntity task = taskRepo.findTaskEntityById(taskId)
+                .orElseThrow(() -> new GenericException(HttpStatus.BAD_REQUEST, "Invalid task id", "Check task id and try again"));
+
+        UserEntity user = task.getUser();
+
+        task.setPeriodInDays(taskRequest.getPeriodInDays());
+        task.setStartDate(taskRequest.getStartDate());
+        task.setStatus(taskRequest.getStatus());
+        task.setTaskTitle(taskRequest.getTaskTitle());
+        task.setTaskDetails(taskRequest.getTaskDetails());
+
+        if (taskRequest.getFirstName() != null && taskRequest.getLastName() != null) {
+            UserEntity userEntity = userRepo.findByFirstNameIgnoreCaseAndLastNameIgnoreCase(taskRequest.getFirstName(), taskRequest.getLastName())
+                    .orElseThrow(() -> new UserNotFoundException("User with name: " + taskRequest.getFirstName() + " " + taskRequest.getLastName() + " not found"));
+
+            task.setUser(userEntity);
+        } else if (user != null) {
+            task.setUser(user);
+        }
+
+        TaskEntity updatedTask = taskRepo.save(task);
+
+        response.setCode("200");
+        response.setDescription("Successful");
+        response.setResponseData(mapper.map(updatedTask, TaskResponse.class));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
