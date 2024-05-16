@@ -9,6 +9,7 @@ import com.donatus.simpletaskmanager.repository.UserRepository;
 import com.donatus.simpletaskmanager.security.JWTGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,14 +21,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserManagementService {
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
 
-    public ResponseEntity<ApiResponse<String>> registerNewUser(UserRequest userRequest, HttpServletRequest request) {
-        if (userRepo.existsByEmail(userRequest.getEmail().toLowerCase())) {
+    public ResponseEntity<ApiResponse<String>> registerNewUser(UserSignupDto userRequest, HttpServletRequest request) {
+        if (userRepo.existsByEmail(userRequest.getEmail().strip())) {
             throw new DuplicateEmailException("Email already exist!");
         }
 
@@ -43,19 +45,20 @@ public class UserManagementService {
             UserEntity user = UserEntity.builder()
                     .firstName(userRequest.getFirstName())
                     .lastName(userRequest.getLastName())
-                    .email(userRequest.getEmail().toLowerCase())
+                    .email(userRequest.getEmail().strip())
                     .password(encoder.encode(userRequest.getPassword()))
                     .confirmPassword(userRequest.getConfirmPassword())
                     .phoneNumber(userRequest.getPhoneNumber())
                     .address(userRequest.getAddress())
                     .gender(Gender.valueOf(userRequest.getGender().toUpperCase()))
                     .roles(
-                            path.contains("users") ? Roles.USER : Roles.ADMIN
+                            path.contains("/user/") ? Roles.USER : Roles.ADMIN
                     )
-                    .isVerified(false)
                     .build();
             userRepo.save(user);
 
+            log.info("Path is: {}", path);
+            log.info("User with email: {} registered.", user.getEmail());
             response.setCode("200");
             response.setDescription("Successful");
             response.setResponseData(null);
@@ -76,7 +79,7 @@ public class UserManagementService {
         UserEntity user = userRepo.findUserEntityByEmail(loginRequest.getEmail().toLowerCase())
                 .orElseThrow(() -> new UserNotFoundException("Invalid Email address."));
 
-        if (!path.contains(String.valueOf(user.getRoles()).toLowerCase() + 's')) {
+        if (!path.contains("/"+String.valueOf(user.getRoles()).toLowerCase()+"/")) {
             throw new UnauthorizedException("You are not authorized access this page");
         }
 
@@ -85,12 +88,8 @@ public class UserManagementService {
             throw new InvalidPasswordException("Invalid password!");
         }
 
-        if (!user.getIsVerified()) {
-            throw new UserNotVerifiedException("Not verified!");
-        }
-
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail().toLowerCase(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail().strip(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

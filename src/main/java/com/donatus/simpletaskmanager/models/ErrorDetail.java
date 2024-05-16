@@ -12,5 +12,4 @@ public class ErrorDetail {
     private String message;
     private HttpStatus status;
     private String debugMessage;
-    private String dateTime;
 }

@@ -46,8 +46,6 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private Roles roles;
 
-    private Boolean isVerified;
-
     @OneToMany(mappedBy = "user", cascade = {CascadeType.DETACH,CascadeType.MERGE
             ,CascadeType.PERSIST,CascadeType.REFRESH},fetch = FetchType.LAZY)
     private List<TaskEntity> userTasks = new ArrayList<>();
