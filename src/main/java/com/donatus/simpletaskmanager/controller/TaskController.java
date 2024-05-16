@@ -1,12 +1,10 @@
 package com.donatus.simpletaskmanager.controller;
 
-import com.donatus.simpletaskmanager.dto.ApiResponse;
-import com.donatus.simpletaskmanager.dto.PaginatedResponse;
-import com.donatus.simpletaskmanager.dto.TaskRequest;
-import com.donatus.simpletaskmanager.dto.TaskResponse;
+import com.donatus.simpletaskmanager.dto.*;
 import com.donatus.simpletaskmanager.models.TaskEntity;
 import com.donatus.simpletaskmanager.services.TaskManagementService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,5 +36,21 @@ public class TaskController {
     public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@Valid @RequestBody TaskRequest taskRequest,
                                                                 @RequestParam("taskId") Long taskId){
         return taskService.updateTask(taskRequest, taskId);
+    }
+
+    @DeleteMapping("/tasks")
+    public ResponseEntity<ApiResponse<TaskResponse>> DeleteTask(@RequestParam("taskId") Long taskId){
+        return taskService.deleteTaskById(taskId);
+    }
+
+    @PutMapping("/assign")
+    public ResponseEntity<ApiResponse<TaskResponse>> assignTask(@Valid @RequestBody AssignTaskRequest taskRequest){
+        return taskService.assignTaskToUser(taskRequest);
+    }
+
+    @PutMapping("/task_status")
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTaskStatus(@RequestParam("status") String status,
+            @RequestParam("taskId") Long taskId){
+        return taskService.updateTaskStatus(status, taskId);
     }
 }
