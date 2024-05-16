@@ -42,9 +42,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(configure ->
                 configure
                         .requestMatchers(antMatcher(HttpMethod.GET, "/health")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/users/signup")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/users/login")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/registration/**")).permitAll()
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/user-mgmt/**")).permitAll()
+//                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/user-mgmt/login")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/profile/**")).hasAnyAuthority("USER", "DRIVER", "ADMIN")
                         .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/profile/**")).hasAnyAuthority("USER", "DRIVER", "ADMIN")
                         .anyRequest().authenticated());

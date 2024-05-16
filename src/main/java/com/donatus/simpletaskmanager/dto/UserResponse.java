@@ -1,9 +1,6 @@
 package com.donatus.simpletaskmanager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * DTO for {@link com.donatus.simpletaskmanager.models.UserEntity}
@@ -12,10 +9,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserResponse {
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String address;
+    private AuthResponse authResponse;
 }
