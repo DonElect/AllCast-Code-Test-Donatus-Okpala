@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class PaginatedResponse<T> {
     private List<T> content;
-    private int pageNo;
+    private int pageNum;
     private int pageSize;
     private long totalElement;
     //private int totalPages;
