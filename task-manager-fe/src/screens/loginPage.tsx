@@ -60,7 +60,6 @@ function LoginScreen() {
     } catch (err) {
       if (err && err instanceof AxiosError) {
         if (err.response?.data.responseMessage === "Not verified!") {
-          reSendLink();
         }
         setError(err.response?.data.responseMessage);
       } else if (err && err instanceof Error) setError(err.message);
@@ -69,39 +68,9 @@ function LoginScreen() {
     }
   };
 
-  const reSendLink = async () => {
-    setError("");
-
-    try {
-      const response = await axios.get(
-        "http://localhost:8085/api/v1/registration/re_verification?email=" +
-          email
-      );
-
-      console.log(response.data);
-      alert("Verification link sent to your email.");
-      // Rederict to home page on successful login
-      // closeModal2();
-    } catch (err) {
-      if (err && err instanceof AxiosError)
-        setError(err.response?.data.responseMessage);
-      else if (err && err instanceof Error) setError(err.message);
-
-      console.log("Error: ", err);
-    }
-  };
-
   return (
-    <div className="bg-sky-950">
+    <div className="bg-sky-950 w-[100%]">
       <div className="gap-5 flex max-md:flex-col max-md:items-stretch max-md:gap-0">
-        {/* <div className="flex flex-col items-stretch w-[55%] max-md:w-full max-md:ml-0 ">
-          <img
-            loading="lazy"
-            src="https://res.cloudinary.com/djzlwrhxq/image/upload/v1700312154/ihcvgjuolphaonieuvjm.png"
-            alt="backgroud"
-            className="aspect-[0.7] object-fill  object-center w-full  overflow-hidden grow max-md:max-w-full"
-          />
-        </div> */}
         <div className="md:container md:mx-auto px-8 py-20 md:w-8/12 lg:w-5/12">
           <div className="items-center shadow-lg bg-white flex flex-col px-8 rounded-2xl max-md:px-5">
             <div className="justify-center items-stretch mt-7 self-center flex w-[100px] max-w-full gap-0 ">
@@ -133,7 +102,6 @@ function LoginScreen() {
                 </label>
                 <Form.Item
                   name="email"
-                  // className="w-full px-3 mb-1"
                   rules={[
                     {
                       type: "email",

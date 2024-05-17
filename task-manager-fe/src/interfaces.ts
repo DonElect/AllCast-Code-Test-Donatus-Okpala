@@ -1,12 +1,13 @@
 export interface Task {
   id: number;
-  title: string;
-  details?: string;
+  taskTitle: string;
+  taskDetails?: string;
+  status: string;
   email: string;
   firstName: string
   lastName: string;
   dateCreated: Date;
-  taskPeriod: string;
+  periodInDays: string;
   startDate: Date;
   dateModified: Date;
 }

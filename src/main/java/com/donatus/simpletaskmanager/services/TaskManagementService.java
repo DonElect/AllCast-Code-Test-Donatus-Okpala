@@ -127,9 +127,11 @@ public class TaskManagementService {
                 .map(taskEntity -> {
                     TaskResponse taskResponse = mapper.map(taskEntity, TaskResponse.class);
 
-                    taskResponse.setFirstName(taskEntity.getUser().getFirstName());
-                    taskResponse.setLastName(taskEntity.getUser().getLastName());
-                    taskResponse.setEmail(taskEntity.getUser().getEmail());
+                    if(taskEntity.getUser() != null){
+                        taskResponse.setFirstName(taskEntity.getUser().getFirstName());
+                        taskResponse.setLastName(taskEntity.getUser().getLastName());
+                        taskResponse.setEmail(taskEntity.getUser().getEmail());
+                    }
 
                     return taskResponse;
                 })
