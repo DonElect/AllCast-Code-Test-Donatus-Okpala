@@ -172,8 +172,7 @@ public class TaskManagementService {
     }
 
     public ResponseEntity<ApiResponse<TaskResponse>> assignTaskToUser(AssignTaskRequest taskRequest){
-        UserEntity user = userRepo.findByFirstNameIgnoreCaseAndLastNameIgnoreCaseOrEmail(taskRequest.getFirstName(),
-                        taskRequest.getLastName(), taskRequest.getEmail())
+        UserEntity user = userRepo.findUserEntityByEmail(taskRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User does not exist!"));
 
         TaskEntity task = taskRepo.findTaskEntityById(taskRequest.getTaskId())
@@ -190,9 +189,12 @@ public class TaskManagementService {
         response.setDescription("Successful");
         TaskResponse taskResponse = mapper.map(savedTask, TaskResponse.class);
 
-        taskResponse.setFirstName(user.getFirstName());
-        taskResponse.setLastName(user.getLastName());
-        taskResponse.setEmail(user.getEmail());
+        if(user != null){
+            taskResponse.setFirstName(user.getFirstName());
+            taskResponse.setLastName(user.getLastName());
+            taskResponse.setEmail(user.getEmail());
+        }
+
         response.setResponseData(taskResponse);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
