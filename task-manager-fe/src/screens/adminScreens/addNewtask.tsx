@@ -145,7 +145,7 @@ const AddTaskScreen = () => {
           <button
             type="button"
             className="w-full h-12 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 rounded mt-4 border-none"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/tasks")}
           >
             cancel
           </button>
