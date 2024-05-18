@@ -1,4 +1,3 @@
-// TaskList.tsx
 import { useEffect, useState } from "react";
 import { Task } from "../../interfaces";
 import customFetch from "../../utils/CustomFetch";
@@ -27,11 +26,8 @@ const HomeScreen = () => {
     try {
       await customFetch(localStorage.getItem("accessToken"))
         .delete(`/task-mgmt/tasks?taskId=${taskId}`)
-        .then((res) => {
-          res.data.responseData;
-
+        .then(() => {
           setRefresh(!hasRefresh);
-
           alert("Task deleted successfully!");
         });
     } catch (err) {
@@ -40,16 +36,15 @@ const HomeScreen = () => {
           setError("Session expired");
         }
         setError(err.response?.data.description);
-      } else if (err && err instanceof Error) setError(err.message);
-
-      console.log("Error: ", err);
+      } else if (err && err instanceof Error) {
+        setError(err.message);
+      }
     }
   }
 
   useEffect(() => {
     const userRole = localStorage.getItem("role") || "";
     getOrderHistory(userRole);
-
     setRole(userRole);
     setFirstName(localStorage.getItem("firstName") || "");
     setLastName(localStorage.getItem("lastName") || "");
@@ -65,7 +60,6 @@ const HomeScreen = () => {
         )
         .then((res) => {
           const data = res.data.responseData;
-
           setPageNum(data.pageNum);
           setPageSize(data.pageSize);
           setLast(data.last);
@@ -77,9 +71,9 @@ const HomeScreen = () => {
           setError("Session expired");
         }
         setError(err.response?.data.description);
-      } else if (err && err instanceof Error) setError(err.message);
-
-      console.log("Error: ", err);
+      } else if (err && err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
@@ -109,6 +103,26 @@ const HomeScreen = () => {
     setCurrentTask(null);
   };
 
+  const handleActionChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    task: Task
+  ) => {
+    const action = event.target.value;
+    switch (action) {
+      case "edit":
+        handleEditClick(task);
+        break;
+      case "delete":
+        handleDeleteClick(task.id);
+        break;
+      case "assign":
+        handleAssignClick(task);
+        break;
+      default:
+        break;
+    }
+  };
+
   const renderTaskDetails = (task: Task) => (
     <>
       <td className="px-4 py-2 border-r">{task.taskTitle}</td>
@@ -131,68 +145,59 @@ const HomeScreen = () => {
           : "N/A"}
       </td>
       <td className="px-4 py-2 border-r">{task.status.replace("_", " ")}</td>
-      <td className="px-4 py-2 border-r flex space-x-2">
-        <button
-          onClick={() => handleEditClick(task)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border-none"
-        >
-          Edit
-        </button>
-        {role === "ADMIN" && (
-          <>
-            <button
-              onClick={() => handleDeleteClick(task.id)}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded border-none"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => handleAssignClick(task)}
-              className="bg-mantis-500 hover:bg-mantis-700 text-white font-bold py-2 px-4 rounded border-none"
-            >
-              Assign
-            </button>
-          </>
+      <td className="px-4 py-2 border-r">
+        {role === "ADMIN" ? (
+          <select
+            className="bg-white border rounded px-4 py-2"
+            onChange={(event) => handleActionChange(event, task)}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Select Action
+            </option>
+            <option value="edit">Edit</option>
+            <option value="delete">Delete</option>
+            <option value="assign">Assign</option>
+          </select>
+        ) : (
+          <button
+            onClick={() => handleEditClick(task)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200 border-none"
+          >
+            Edit
+          </button>
         )}
       </td>
     </>
   );
 
   function handlePreviousPage() {
-    setPageNum((prev) => {
-      let n = prev - 1;
-
-      if (n < 0) n = 0;
-
-      return n;
-    });
+    setPageNum((prev) => (prev > 0 ? prev - 1 : 0));
   }
 
   function handleNextpage() {
-    if (isLast) return;
-
-    setPageNum((prev) => prev + 1);
+    if (!isLast) setPageNum((prev) => prev + 1);
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100 p-4">
-      <div className="container max-w-6xl mx-auto bg-white shadow-md rounded p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">{`${
-          role === "ADMIN" ? "User Tasks" : firstName + " " + lastName
-        }`}</h2>
+    <div className="flex min-h-screen bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 p-4">
+      <div className="container max-w-6xl mx-auto bg-white shadow-2xl rounded-lg p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">
+          {role === "ADMIN" ? "User Tasks" : `${firstName} ${lastName}`}
+        </h2>
         {role === "ADMIN" && (
           <p
-            className="text-right text-violet-700 cursor-pointer mb-4"
+            className="text-right text-indigo-600 cursor-pointer mb-6"
             onClick={() => navigate("/tasks/new")}
           >
             Add New Task
           </p>
         )}
-        <span className="text-red-700 block mb-4">{error}</span>
+        {error && <span className="text-red-700 block mb-4">{error}</span>}
         <div className="overflow-x-auto">
-          <table className="w-full text-left table-auto border-collapse">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-sm font-medium">
+              <tr className="bg-indigo-100 text-sm font-semibold text-indigo-800">
                 <th className="px-4 py-2 border-b">Title</th>
                 <th className="px-4 py-2 border-b">Details</th>
                 <th className="px-4 py-2 border-b">Assigned To</th>
@@ -205,38 +210,37 @@ const HomeScreen = () => {
               </tr>
             </thead>
             <tbody>
-              {tasks &&
-                tasks.map((task, i) => (
-                  <>
-                    <tr key={i} className="hover:bg-gray-100">
-                      {isEditing && currentTask?.id === task.id ? (
-                        <EditTask task={task} onCancle={handleCancel} />
-                      ) : (
-                        renderTaskDetails(task)
-                      )}
-                    </tr>
-                    <tr key={task.id} className="hover:bg-gray-100">
-                      {isAssigning && currentTask?.id === task.id && (
-                        <AssignTaskScreen
-                          onCancle={cancelAssigning}
-                          task={task}
-                        />
-                      )}
-                    </tr>
-                  </>
-                ))}
+              {tasks.map((task, i) => (
+                <>
+                  <tr key={i} className="hover:bg-indigo-50">
+                    {isEditing && currentTask?.id === task.id ? (
+                      <EditTask task={task} onCancle={handleCancel} />
+                    ) : (
+                      renderTaskDetails(task)
+                    )}
+                  </tr>
+                  <tr key={task.id} className="hover:bg-indigo-50">
+                    {isAssigning && currentTask?.id === task.id && (
+                      <AssignTaskScreen
+                        onCancle={cancelAssigning}
+                        task={task}
+                      />
+                    )}
+                  </tr>
+                </>
+              ))}
             </tbody>
           </table>
         </div>
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between mt-6">
           <button
             type="button"
             onClick={handlePreviousPage}
-            className={` ${
+            className={`${
               pageNum < 1
-                ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                : "bg-green-400 hover:bg-green-700 text-white"
-            } font-bold py-2 px-4 rounded border-none`}
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-indigo-500 hover:bg-indigo-700 text-white"
+            } font-bold py-2 px-4 rounded transition duration-200`}
           >
             Previous
           </button>
@@ -245,9 +249,9 @@ const HomeScreen = () => {
             onClick={handleNextpage}
             className={`${
               isLast
-                ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                : "bg-green-400 hover:bg-green-700 text-white"
-            } font-bold py-2 px-4 rounded border-none`}
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-indigo-500 hover:bg-indigo-700 text-white"
+            } font-bold py-2 px-4 rounded transition duration-200`}
           >
             Next
           </button>
