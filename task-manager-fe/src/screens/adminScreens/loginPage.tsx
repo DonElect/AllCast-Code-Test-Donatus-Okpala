@@ -30,17 +30,21 @@ function LoginScreen() {
 
     try {
       const response = await axios.post(
-        "http://localhost:2024/api/v1/user-mgmt/admin/login",
+        "http://localhost:2024/api/v1/user-mgmt/login",
         CustomerLogin
       );
 
-      const data = response.data.responseData.authResponse;
+      const data = response.data.responseData;
 
-      const accessToken = data.accessToken;
-      const refreshToken = data.refreshToken;
+      const accessToken = data.authResponse.accessToken;
+      const refreshToken = data.authResponse.refreshToken;
+      const role = data.role;
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("role", role);
+      localStorage.setItem("firstName", data.firstName);
+      localStorage.setItem("lastName", data.lastName);
 
       console.log("Access Token:  " + accessToken);
 
@@ -81,7 +85,7 @@ function LoginScreen() {
               </div>
             </div>
             <div className="text-gray-900 text-lg font-bold leading-9 whitespace-nowrap md:whitespace-normal mt-1">
-              Welcome back Task Manager{" "}
+              Welcome back To Task Manager{" "}
             </div>
             <Form
               form={form}

@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import customFetch from "../utils/CustomFetch";
+import customFetch from "../../utils/CustomFetch";
 
 interface Task {
   taskTitle: string;
@@ -16,7 +16,12 @@ interface Task {
 
 const AddTaskScreen = () => {
   const navigate = useNavigate();
-  const { control, handleSubmit, formState: { errors }, register } = useForm<Task>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    register,
+  } = useForm<Task>();
   const [startDate, setStartDate] = useState(new Date());
   const [error, setError] = useState("");
 
@@ -51,10 +56,14 @@ const AddTaskScreen = () => {
     <div className="flex items-center justify-center">
       <div className="container max-w-md mx-auto px-4 py-8 bg-mantis-200 shadow-md rounded">
         <h1 className="text-3xl font-bold mb-6 text-center">Add New Task</h1>
-        {error && <span className="text-red-500 mb-4 block text-center">{error}</span>}
+        {error && (
+          <span className="text-red-500 mb-4 block text-center">{error}</span>
+        )}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col mb-4">
-            <label htmlFor="title" className="mb-2 text-lg font-medium">Task Title:</label>
+            <label htmlFor="title" className="mb-2 text-lg font-medium">
+              Task Title:
+            </label>
             <input
               type="text"
               id="title"
@@ -67,7 +76,9 @@ const AddTaskScreen = () => {
             )}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="details" className="mb-2 text-lg font-medium">Details (Optional):</label>
+            <label htmlFor="details" className="mb-2 text-lg font-medium">
+              Details (Optional):
+            </label>
             <textarea
               id="details"
               className="h-24 border border-gray-300 rounded px-3 py-2 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -76,7 +87,9 @@ const AddTaskScreen = () => {
             />
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="periodInDays" className="mb-2 text-lg font-medium">Completion Period (Days):</label>
+            <label htmlFor="periodInDays" className="mb-2 text-lg font-medium">
+              Completion Period (Days):
+            </label>
             <input
               type="number"
               id="periodInDays"
@@ -88,7 +101,9 @@ const AddTaskScreen = () => {
             )}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="startDate" className="mb-2 text-lg font-medium">Start Date:</label>
+            <label htmlFor="startDate" className="mb-2 text-lg font-medium">
+              Start Date:
+            </label>
             <Controller
               name="startDate"
               control={control}
@@ -104,7 +119,9 @@ const AddTaskScreen = () => {
             />
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="status" className="mb-2 text-lg font-medium">Task Status:</label>
+            <label htmlFor="status" className="mb-2 text-lg font-medium">
+              Task Status:
+            </label>
             <select
               id="status"
               className="block w-full h-10 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -128,7 +145,7 @@ const AddTaskScreen = () => {
           <button
             type="button"
             className="w-full h-12 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 rounded mt-4 border-none"
-            onClick={()=> navigate("/home")}
+            onClick={() => navigate("/home")}
           >
             cancel
           </button>

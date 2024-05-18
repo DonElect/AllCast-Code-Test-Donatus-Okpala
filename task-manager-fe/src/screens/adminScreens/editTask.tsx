@@ -1,7 +1,7 @@
 import { DatePicker } from "antd";
 import { AxiosError } from "axios";
-import { Task } from "../interfaces";
-import customFetch from "../utils/CustomFetch";
+import { Task } from "../../interfaces";
+import customFetch from "../../utils/CustomFetch";
 import { useState } from "react";
 
 interface Props {

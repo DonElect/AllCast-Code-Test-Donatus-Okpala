@@ -57,4 +57,10 @@ public class TaskController {
             @RequestParam("taskId") Long taskId){
         return taskService.updateTaskStatus(status, taskId);
     }
+
+    @GetMapping("/tasks/users")
+    public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> getPagedUserTasks(@RequestParam("pageNum") int pageNum,
+                                                                                       @RequestParam("pageSize") int pageSize){
+        return taskService.userTaskPaged(pageNum, pageSize);
+    }
 }

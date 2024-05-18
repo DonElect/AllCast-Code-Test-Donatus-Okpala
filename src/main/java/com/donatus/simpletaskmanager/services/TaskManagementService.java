@@ -113,39 +113,7 @@ public class TaskManagementService {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
         Slice<TaskEntity> pagedTasks = taskRepo.pageAllTask(pageable);
-        PaginatedResponse<TaskResponse> paginatedResponse = new PaginatedResponse<>();
-
-        if (pagedTasks.isEmpty()) {
-            paginatedResponse.setLast(true);
-            paginatedApiResponse.setCode("200");
-            paginatedApiResponse.setDescription("Successful");
-            paginatedApiResponse.setResponseData(paginatedResponse);
-
-            return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
-        }
-        paginatedResponse.setContent(pagedTasks.stream()
-                .map(taskEntity -> {
-                    TaskResponse taskResponse = mapper.map(taskEntity, TaskResponse.class);
-
-                    if(taskEntity.getUser() != null){
-                        taskResponse.setFirstName(taskEntity.getUser().getFirstName());
-                        taskResponse.setLastName(taskEntity.getUser().getLastName());
-                        taskResponse.setEmail(taskEntity.getUser().getEmail());
-                    }
-
-                    return taskResponse;
-                })
-                .toList());
-        paginatedResponse.setPageNum(pagedTasks.getNumber());
-        paginatedResponse.setPageSize(pagedTasks.getSize());
-        paginatedResponse.setLast(pagedTasks.isLast());
-        paginatedResponse.setTotalElement(pagedTasks.getNumberOfElements());
-
-        paginatedApiResponse.setCode("200");
-        paginatedApiResponse.setDescription("Successful");
-        paginatedApiResponse.setResponseData(paginatedResponse);
-
-        return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
+        return getApiResponsePaged(pagedTasks);
     }
 
     public ResponseEntity<ApiResponse<TaskResponse>> updateTask(TaskRequest taskRequest, Long taskId) {
@@ -209,5 +177,53 @@ public class TaskManagementService {
         TaskEntity updatedTask = taskRepo.save(task);
 
         return getApiTaskResponse(updatedTask.getUser(), updatedTask);
+    }
+
+    public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> userTaskPaged(int pageNum, int pageSize) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserEntity user = userRepo.findUserEntityByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User does not exist!"));
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        Slice<TaskEntity> pagedTasks = taskRepo.findByUserId(user.getId(), pageable);
+        return getApiResponsePaged(pagedTasks);
+    }
+
+    private ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> getApiResponsePaged(Slice<TaskEntity> pagedTasks) {
+        PaginatedResponse<TaskResponse> paginatedResponse = new PaginatedResponse<>();
+
+        if (pagedTasks.isEmpty()) {
+            paginatedResponse.setLast(true);
+            paginatedApiResponse.setCode("200");
+            paginatedApiResponse.setDescription("Successful");
+            paginatedApiResponse.setResponseData(paginatedResponse);
+
+            return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
+        }
+        paginatedResponse.setContent(pagedTasks.stream()
+                .map(taskEntity -> {
+                    TaskResponse taskResponse = mapper.map(taskEntity, TaskResponse.class);
+
+                    if(taskEntity.getUser() != null){
+                        taskResponse.setFirstName(taskEntity.getUser().getFirstName());
+                        taskResponse.setLastName(taskEntity.getUser().getLastName());
+                        taskResponse.setEmail(taskEntity.getUser().getEmail());
+                    }
+
+                    return taskResponse;
+                })
+                .toList());
+        paginatedResponse.setPageNum(pagedTasks.getNumber());
+        paginatedResponse.setPageSize(pagedTasks.getSize());
+        paginatedResponse.setLast(pagedTasks.isLast());
+        paginatedResponse.setTotalElement(pagedTasks.getNumberOfElements());
+
+        paginatedApiResponse.setCode("200");
+        paginatedApiResponse.setDescription("Successful");
+        paginatedApiResponse.setResponseData(paginatedResponse);
+
+        return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
     }
 }

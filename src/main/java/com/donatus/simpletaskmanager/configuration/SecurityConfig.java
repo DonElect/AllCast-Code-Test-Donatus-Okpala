@@ -36,16 +36,20 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(configure ->
                 configure
                         .requestMatchers(antMatcher(HttpMethod.GET, "/health")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/user-mgmt/**")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/task-mgmt/**")).hasAnyAuthority("ADMIN")
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/task-mgmt/task")).hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(antMatcher(HttpMethod.PUT, "/api/v1/task-mgmt/task")).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/user-mgmt/users")).hasAnyAuthority("ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/task-mgmt/tasks")).hasAnyAuthority("ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/task-mgmt/tasks_assign")).hasAnyAuthority("ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.DELETE, "/api/v1/task-mgmt/tasks")).hasAnyAuthority("ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.PUT, "/api/v1/task-mgmt/assign")).hasAnyAuthority("ADMIN")
+                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/task-mgmt/tasks")).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/task-mgmt/tasks/users")).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(antMatcher(HttpMethod.PUT, "/api/v1/task-mgmt/tasks")).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated());
         http.httpBasic(HttpBasicConfigurer::disable);
         http.csrf(CsrfConfigurer::disable);
