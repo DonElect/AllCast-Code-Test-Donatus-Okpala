@@ -1,7 +1,7 @@
 // TaskList.tsx
 import { useEffect, useState } from "react";
-import { Task } from "../interfaces";
-import customFetch from "../utils/CustomFetch";
+import { Task } from "../../interfaces";
+import customFetch from "../../utils/CustomFetch";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import EditTask from "./editTask";
@@ -17,7 +17,10 @@ const HomeScreen = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hasRefresh, setRefresh] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
-  
+  const [role, setRole] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   const navigate = useNavigate();
 
   async function onDelete(taskId: number) {
@@ -45,12 +48,21 @@ const HomeScreen = () => {
 
   useEffect(() => {
     getOrderHistory();
+    const userRole = localStorage.getItem("role") || "";
+
+    setRole(userRole);
+    setFirstName(localStorage.getItem("firstName") || "");
+    setLastName(localStorage.getItem("lastName") || "");
   }, [pageNum, hasRefresh]);
 
   const getOrderHistory = async () => {
     try {
       await customFetch(localStorage.getItem("accessToken"))
-        .get(`/task-mgmt/tasks?pageNum=${pageNum}&pageSize=${pageSize}`)
+        .get(
+          `/task-mgmt${
+            role === "ADMIN" ? "/tasks" : "/tasks/users"
+          }?pageNum=${pageNum}&pageSize=${pageSize}`
+        )
         .then((res) => {
           const data = res.data.responseData;
 
@@ -89,12 +101,13 @@ const HomeScreen = () => {
   const handleAssignClick = (task: Task) => {
     setIsAssigning(true);
     setCurrentTask(task);
-  }
+  };
 
-  const cancelAssigning = ()=> {
+  const cancelAssigning = () => {
     setRefresh(!hasRefresh);
     setIsAssigning(false);
-  }
+    setCurrentTask(null);
+  };
 
   const renderTaskDetails = (task: Task) => (
     <>
@@ -102,7 +115,9 @@ const HomeScreen = () => {
       <td className="px-4 py-2 border-r">
         {task.taskDetails || "No details provided."}
       </td>
-      <td className="px-4 py-2 border-r">{task.firstName}{" "}{task.lastName}</td>
+      <td className="px-4 py-2 border-r">
+        {task.firstName} {task.lastName}
+      </td>
       <td className="px-4 py-2 border-r">
         {new Date(task.dateCreated).toLocaleDateString()}
       </td>
@@ -123,18 +138,22 @@ const HomeScreen = () => {
         >
           Edit
         </button>
-        <button
-          onClick={() => handleDeleteClick(task.id)}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded border-none"
-        >
-          Delete
-        </button>
-        <button
-          onClick={() => handleAssignClick(task)}
-          className="bg-mantis-500 hover:bg-mantis-700 text-white font-bold py-2 px-4 rounded border-none"
-        >
-          Assign
-        </button>
+        {role === "ADMIN" && (
+          <>
+            <button
+              onClick={() => handleDeleteClick(task.id)}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded border-none"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => handleAssignClick(task)}
+              className="bg-mantis-500 hover:bg-mantis-700 text-white font-bold py-2 px-4 rounded border-none"
+            >
+              Assign
+            </button>
+          </>
+        )}
       </td>
     </>
   );
@@ -158,13 +177,17 @@ const HomeScreen = () => {
   return (
     <div className="flex min-h-screen bg-gray-100 p-4">
       <div className="container max-w-6xl mx-auto bg-white shadow-md rounded p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center">User Tasks</h2>
-        <p
-          className="text-right text-violet-700 cursor-pointer mb-4"
-          onClick={() => navigate("/tasks/new")}
-        >
-          Add New Task
-        </p>
+        <h2 className="text-2xl font-bold mb-4 text-center">{`${
+          role === "ADMIN" ? "User Tasks" : firstName+" "+lastName 
+        }`}</h2>
+        {role === "ADMIN" && (
+          <p
+            className="text-right text-violet-700 cursor-pointer mb-4"
+            onClick={() => navigate("/tasks/new")}
+          >
+            Add New Task
+          </p>
+        )}
         <span className="text-red-700 block mb-4">{error}</span>
         <div className="overflow-x-auto">
           <table className="w-full text-left table-auto border-collapse">
@@ -185,16 +208,22 @@ const HomeScreen = () => {
               {tasks &&
                 tasks.map((task) => (
                   <>
-                  <tr key={task.id} className="hover:bg-gray-100">
-                    {isEditing && currentTask?.id === task.id
-                      ? <EditTask task={task} onCancle={handleCancel} />
-                      : renderTaskDetails(task)}
-                  </tr>
-                  <tr key={task.id} className="hover:bg-gray-100">
-                  {(isAssigning && currentTask?.id === task.id)
-                    && <AssignTaskScreen  onCancle={cancelAssigning} task={task} />}
-                </tr>
-                </>
+                    <tr key={task.id} className="hover:bg-gray-100">
+                      {isEditing && currentTask?.id === task.id ? (
+                        <EditTask task={task} onCancle={handleCancel} />
+                      ) : (
+                        renderTaskDetails(task)
+                      )}
+                    </tr>
+                    <tr key={task.id} className="hover:bg-gray-100">
+                      {isAssigning && currentTask?.id === task.id && (
+                        <AssignTaskScreen
+                          onCancle={cancelAssigning}
+                          task={task}
+                        />
+                      )}
+                    </tr>
+                  </>
                 ))}
             </tbody>
           </table>

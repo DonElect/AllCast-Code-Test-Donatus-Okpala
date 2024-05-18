@@ -4,7 +4,6 @@ import com.donatus.simpletaskmanager.dto.*;
 import com.donatus.simpletaskmanager.exception.*;
 import com.donatus.simpletaskmanager.models.Gender;
 import com.donatus.simpletaskmanager.models.Roles;
-import com.donatus.simpletaskmanager.models.TaskEntity;
 import com.donatus.simpletaskmanager.models.UserEntity;
 import com.donatus.simpletaskmanager.repository.UserRepository;
 import com.donatus.simpletaskmanager.security.JWTGenerator;
@@ -83,11 +82,6 @@ public class UserManagementService {
         UserEntity user = userRepo.findUserEntityByEmail(loginRequest.getEmail().toLowerCase())
                 .orElseThrow(() -> new UserNotFoundException("Invalid Email address."));
 
-        if (!path.contains("/"+String.valueOf(user.getRoles()).toLowerCase()+"/")) {
-            throw new UnauthorizedException("You are not authorized access this page");
-        }
-
-
         if (!encoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Invalid password!");
         }
@@ -109,6 +103,7 @@ public class UserManagementService {
                 .email(user.getEmail())
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
+                .role(user.getRoles())
                 .authResponse(authResponse)
                 .build();
 
@@ -123,34 +118,34 @@ public class UserManagementService {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
 
         Slice<UserEntity> pagedUser = userRepo.findAllByRoles(Roles.USER, pageable);
-        PaginatedResponse<UserResponse> paginatedResponse = new PaginatedResponse<>();
+        PaginatedResponse<UserResponse> pagedUserResponse = new PaginatedResponse<>();
         ApiResponse<PaginatedResponse<UserResponse>> paginatedApiResponse = new ApiResponse<>();
 
         if (pagedUser.isEmpty()) {
-            paginatedResponse.setLast(true);
+            pagedUserResponse.setLast(true);
             paginatedApiResponse.setCode("200");
             paginatedApiResponse.setDescription("Successful");
-            paginatedApiResponse.setResponseData(paginatedResponse);
+            paginatedApiResponse.setResponseData(pagedUserResponse);
 
             return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
         }
-        paginatedResponse.setContent(pagedUser.stream()
+        pagedUserResponse.setContent(pagedUser.stream()
                 .map(userEntity ->
-                    UserResponse.builder()
-                            .firstName(userEntity.getFirstName())
-                            .lastName(userEntity.getLastName())
-                            .email(userEntity.getEmail())
-                            .build()
+                        UserResponse.builder()
+                                .firstName(userEntity.getFirstName())
+                                .lastName(userEntity.getLastName())
+                                .email(userEntity.getEmail())
+                                .build()
                 )
                 .toList());
-        paginatedResponse.setPageNum(pagedUser.getNumber());
-        paginatedResponse.setPageSize(pagedUser.getSize());
-        paginatedResponse.setLast(pagedUser.isLast());
-        paginatedResponse.setTotalElement(pagedUser.getNumberOfElements());
+        pagedUserResponse.setPageNum(pagedUser.getNumber());
+        pagedUserResponse.setPageSize(pagedUser.getSize());
+        pagedUserResponse.setLast(pagedUser.isLast());
+        pagedUserResponse.setTotalElement(pagedUser.getNumberOfElements());
 
         paginatedApiResponse.setCode("200");
         paginatedApiResponse.setDescription("Successful");
-        paginatedApiResponse.setResponseData(paginatedResponse);
+        paginatedApiResponse.setResponseData(pagedUserResponse);
 
         return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
     }

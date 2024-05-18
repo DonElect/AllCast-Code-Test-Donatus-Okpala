@@ -1,9 +1,9 @@
 // AssignTaskScreen.tsx
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import customFetch from "../utils/CustomFetch";
+import customFetch from "../../utils/CustomFetch";
 import { AxiosError } from "axios";
-import { Task } from "../interfaces";
+import { Task } from "../../interfaces";
 
 interface User {
   firstName: string;

@@ -20,7 +20,7 @@ public class UserManagementController {
         return userManagementService.registerNewUser(signupDto, servletRequest);
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<UserResponse>> loginUser(@Valid @RequestBody LoginRequest loginRequest,
                                                                HttpServletRequest servletRequest){
         return userManagementService.loginUser(loginRequest, servletRequest);
@@ -30,12 +30,6 @@ public class UserManagementController {
     public ResponseEntity<ApiResponse<String>> signupNewAmin(@Valid @RequestBody UserSignupDto signupDto,
                                                              HttpServletRequest servletRequest){
         return userManagementService.registerNewUser(signupDto, servletRequest);
-    }
-
-    @PostMapping("/admin/login")
-    public ResponseEntity<ApiResponse<UserResponse>> loginAdmin(@Valid @RequestBody LoginRequest loginRequest,
-                                                               HttpServletRequest servletRequest){
-        return userManagementService.loginUser(loginRequest, servletRequest);
     }
 
     @GetMapping("/users")

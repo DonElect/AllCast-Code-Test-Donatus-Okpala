@@ -14,7 +14,7 @@ const Customer = {
   gender: "",
 };
 
-function SignupScreen() {
+function UserSignupScreen() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [form] = Form.useForm();
@@ -51,7 +51,7 @@ function SignupScreen() {
 
     try {
       await axios
-        .post("http://localhost:2024/api/v1/user-mgmt/admin/signup", Customer)
+        .post("http://localhost:2024/api/v1/user-mgmt/user/signup", Customer)
         .then((response) => {
           console.log(response.data);
 
@@ -101,7 +101,6 @@ function SignupScreen() {
 
   return (
     <div className="bg-sky-950 container mx-auto">
-      {/* <div className="gap-5 flex max-md:flex-col max-md:items-stretch max-md:gap-0"> */}
       <div className="md:container md:mx-auto px-8 py-20 md:w-8/12 lg:w-5/12">
         <div className="items-center shadow-lg bg-white flex flex-col px-8 rounded-2xl max-md:px-5">
           <div className="justify-center items-stretch mt-7 self-center flex w-[100px] max-w-full gap-0 ">
@@ -379,7 +378,7 @@ function SignupScreen() {
                 type="button"
                 onClick={saveUser}
               >
-                Sign Up
+                User Sign Up
               </button>
             </div>
           </Form>
@@ -399,4 +398,4 @@ function SignupScreen() {
   );
 }
 
-export default SignupScreen;
+export default UserSignupScreen;

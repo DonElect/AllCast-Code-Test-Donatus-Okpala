@@ -1,5 +1,6 @@
 package com.donatus.simpletaskmanager.dto;
 
+import com.donatus.simpletaskmanager.models.Roles;
 import lombok.*;
 
 /**
@@ -16,5 +17,6 @@ public class UserResponse {
     private String email;
     private String phoneNumber;
     private String address;
+    private Roles role;
     private AuthResponse authResponse;
 }
