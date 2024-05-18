@@ -5,12 +5,14 @@ import LoginScreen from "./screens/adminScreens/loginPage";
 import HomeScreen from "./screens/adminScreens/homeScreen";
 import SignupScreen from "./screens/adminScreens/signupScreen";
 import AddTaskScreen from "./screens/adminScreens/addNewtask";
+import UserSignupScreen from "./screens/userScreens/userSignupScreen";
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/signup" element={<SignupScreen />} />
+      <Route path="/users/signup" element={<UserSignupScreen />} />
 
       <Route
         path="/tasks"

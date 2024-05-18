@@ -26,8 +26,8 @@ public class TaskManagementService {
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final ModelMapper mapper = new ModelMapper();
-    ApiResponse<TaskResponse> response = new ApiResponse<>();
-    ApiResponse<PaginatedResponse<TaskResponse>> paginatedApiResponse = new ApiResponse<>();
+    private ApiResponse<TaskResponse> response;
+    private ApiResponse<PaginatedResponse<TaskResponse>> paginatedApiResponse;
 
     public ResponseEntity<ApiResponse<TaskResponse>> createNewTaskAndAssignToUser(TaskRequest taskRequest) {
         if (taskRequest.getFirstName() == null || taskRequest.getLastName() == null) {
@@ -41,6 +41,8 @@ public class TaskManagementService {
 
         UserEntity admin = userRepo.findUserEntityByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User does not exist!"));
+
+        response = new ApiResponse<>();
 
         try {
             TaskEntity newTask = TaskEntity.builder()
@@ -81,6 +83,8 @@ public class TaskManagementService {
 
         UserEntity admin = userRepo.findUserEntityByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User does not exist!"));
+
+        response = new ApiResponse<>();
 
         try {
             TaskEntity newTask = TaskEntity.builder()
@@ -134,6 +138,8 @@ public class TaskManagementService {
     public ResponseEntity<ApiResponse<TaskResponse>> deleteTaskById(Long taskId){
         taskRepo.deleteById(taskId);
 
+        response = new ApiResponse<>();
+
         response.setCode("202");
         response.setDescription("Successful");
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
@@ -152,6 +158,8 @@ public class TaskManagementService {
 
     private ResponseEntity<ApiResponse<TaskResponse>> getApiTaskResponse(UserEntity user, TaskEntity task) {
         TaskEntity savedTask = taskRepo.save(task);
+
+        response = new ApiResponse<>();
 
         response.setCode("200");
         response.setDescription("Successful");
@@ -193,6 +201,8 @@ public class TaskManagementService {
 
     private ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> getApiResponsePaged(Slice<TaskEntity> pagedTasks) {
         PaginatedResponse<TaskResponse> paginatedResponse = new PaginatedResponse<>();
+
+        paginatedApiResponse = new ApiResponse<>();
 
         if (pagedTasks.isEmpty()) {
             paginatedResponse.setLast(true);

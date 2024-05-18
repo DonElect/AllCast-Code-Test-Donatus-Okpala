@@ -11,7 +11,7 @@ const HomeScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [pageNum, setPageNum] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(5);
   const [error, setError] = useState("");
   const [isLast, setLast] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -47,15 +47,15 @@ const HomeScreen = () => {
   }
 
   useEffect(() => {
-    getOrderHistory();
     const userRole = localStorage.getItem("role") || "";
+    getOrderHistory(userRole);
 
     setRole(userRole);
     setFirstName(localStorage.getItem("firstName") || "");
     setLastName(localStorage.getItem("lastName") || "");
   }, [pageNum, hasRefresh]);
 
-  const getOrderHistory = async () => {
+  const getOrderHistory = async (role: string) => {
     try {
       await customFetch(localStorage.getItem("accessToken"))
         .get(
@@ -178,7 +178,7 @@ const HomeScreen = () => {
     <div className="flex min-h-screen bg-gray-100 p-4">
       <div className="container max-w-6xl mx-auto bg-white shadow-md rounded p-6">
         <h2 className="text-2xl font-bold mb-4 text-center">{`${
-          role === "ADMIN" ? "User Tasks" : firstName+" "+lastName 
+          role === "ADMIN" ? "User Tasks" : firstName + " " + lastName
         }`}</h2>
         {role === "ADMIN" && (
           <p
@@ -206,9 +206,9 @@ const HomeScreen = () => {
             </thead>
             <tbody>
               {tasks &&
-                tasks.map((task) => (
+                tasks.map((task, i) => (
                   <>
-                    <tr key={task.id} className="hover:bg-gray-100">
+                    <tr key={i} className="hover:bg-gray-100">
                       {isEditing && currentTask?.id === task.id ? (
                         <EditTask task={task} onCancle={handleCancel} />
                       ) : (

@@ -163,19 +163,19 @@ function LoginScreen() {
             <div className=" text-sm leading-5  self-center  mt-5 mb-5 md:flex md:flex-col items-stretch">
               <span className=" text-gray-400">Don't have an account ? </span>
               <a
-                href="/signup"
+                href="/users/signup"
                 className="font-semibold text-violet-700 underline"
               >
                 Sign up here{"   "}
               </a>
-              <p className="text-gray-700">or</p>
+              {/* <p className="text-gray-700">or</p>
               <a
                 href="/reset_password"
                 className="font-semibold text-violet-700 underline"
               >
                 {" "}
                 Forgot password?
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
