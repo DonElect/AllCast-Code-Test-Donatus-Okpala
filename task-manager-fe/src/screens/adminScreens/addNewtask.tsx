@@ -1,4 +1,3 @@
-// AddTaskScreen.tsx
 import { DatePicker } from "antd";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -16,12 +15,7 @@ interface Task {
 
 const AddTaskScreen = () => {
   const navigate = useNavigate();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    register,
-  } = useForm<Task>();
+  const { control, handleSubmit, formState: { errors }, register } = useForm<Task>();
   const [startDate, setStartDate] = useState(new Date());
   const [error, setError] = useState("");
 
@@ -38,8 +32,7 @@ const AddTaskScreen = () => {
       data.startDate = startDate;
       await customFetch(localStorage.getItem("accessToken"))
         .post(`/task-mgmt/tasks`, data)
-        .then((res) => {
-          res.data.responseData;
+        .then(() => {
           navigate("/tasks");
         });
     } catch (err) {
@@ -48,20 +41,22 @@ const AddTaskScreen = () => {
           setError("Session expired");
         }
         setError(err.response?.data.description);
-      } else if (err && err instanceof Error) setError(err.message);
+      } else if (err && err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="container max-w-md mx-auto px-4 py-8 bg-mantis-200 shadow-md rounded">
-        <h1 className="text-3xl font-bold mb-6 text-center">Add New Task</h1>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r">
+      <div className="container max-w-lg mx-auto p-6 bg-gray-300 shadow-2xl rounded-lg">
+        <h1 className="text-4xl font-bold mb-6 text-center text-blue-700">Add New Task</h1>
         {error && (
           <span className="text-red-500 mb-4 block text-center">{error}</span>
         )}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col mb-4">
-            <label htmlFor="title" className="mb-2 text-lg font-medium">
+            <label htmlFor="title" className="mb-2 text-lg font-medium text-gray-700">
               Task Title:
             </label>
             <input
@@ -76,7 +71,7 @@ const AddTaskScreen = () => {
             )}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="details" className="mb-2 text-lg font-medium">
+            <label htmlFor="details" className="mb-2 text-lg font-medium text-gray-700">
               Details (Optional):
             </label>
             <textarea
@@ -87,7 +82,7 @@ const AddTaskScreen = () => {
             />
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="periodInDays" className="mb-2 text-lg font-medium">
+            <label htmlFor="periodInDays" className="mb-2 text-lg font-medium text-gray-700">
               Completion Period (Days):
             </label>
             <input
@@ -101,7 +96,7 @@ const AddTaskScreen = () => {
             )}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="startDate" className="mb-2 text-lg font-medium">
+            <label htmlFor="startDate" className="mb-2 text-lg font-medium text-gray-700">
               Start Date:
             </label>
             <Controller
@@ -119,7 +114,7 @@ const AddTaskScreen = () => {
             />
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="status" className="mb-2 text-lg font-medium">
+            <label htmlFor="status" className="mb-2 text-lg font-medium text-gray-700">
               Task Status:
             </label>
             <select
@@ -138,16 +133,16 @@ const AddTaskScreen = () => {
           </div>
           <button
             type="submit"
-            className="w-full h-12 bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded mt-4 border-none"
+            className="w-full h-12 bg-green-500 hover:bg-green-700 text-white font-bold py-2 rounded mt-4 border-none transition duration-200"
           >
             Add Task
           </button>
           <button
             type="button"
-            className="w-full h-12 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 rounded mt-4 border-none"
+            className="w-full h-12 bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 rounded mt-4 border-none transition duration-200"
             onClick={() => navigate("/tasks")}
           >
-            cancel
+            Cancel
           </button>
         </form>
       </div>
