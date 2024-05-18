@@ -14,7 +14,7 @@ function App() {
       <Route path="/signup" element={<SignupScreen />} />
 
       <Route
-          path="/home"
+          path="/tasks"
           element={
             <RequireAuth loginPath="/login">
               <HomeScreen />
@@ -22,7 +22,7 @@ function App() {
           }
         ></Route>
         <Route
-          path="/new-task"
+          path="/tasks/new"
           element={
             <RequireAuth loginPath="/login">
               <AddTaskScreen />

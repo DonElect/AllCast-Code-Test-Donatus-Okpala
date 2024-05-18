@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
-    @Query(value = "SELECT t FROM TaskEntity t ORDER BY t.dateModified")
+    @Query(value = "SELECT t FROM TaskEntity t ORDER BY t.dateCreated")
     Slice<TaskEntity> pageAllTask(Pageable pageable);
     Optional<TaskEntity> findTaskEntityById(Long id);
     Slice<TaskEntity> findByUserId(Long user_id, Pageable pageable);

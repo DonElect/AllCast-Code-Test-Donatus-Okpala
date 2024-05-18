@@ -11,7 +11,6 @@ public class AssignTaskRequest {
     @NotNull(message = "Task id cannot be null")
     @Min(message = "Task id can not be less that 1!", value = 1)
     private Long taskId;
-    private String firstName;
-    private String lastName;
+    @NotNull(message = "User email cannot be null")
     private String email;
 }

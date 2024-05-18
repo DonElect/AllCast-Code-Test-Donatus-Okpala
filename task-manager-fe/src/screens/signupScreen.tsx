@@ -59,7 +59,7 @@ function SignupScreen() {
         });
     } catch (err) {
       if (err && err instanceof AxiosError)
-        setError(err.response?.data.responseMessage);
+        setError(err.response?.data.description);
       else if (err && err instanceof Error) setError(err.message);
 
       console.log("Error: ", err);
@@ -123,7 +123,7 @@ function SignupScreen() {
             className="md:w-full md:flex md:flex-col md:items-stretch"
             autoComplete="off"
           >
-            <span className="text-red">{error}</span>
+            <span className="text-red-700">{error}</span>
             <div className={`flex flex-row ${error ? "mt-2" : "mt-7"} -mx-3`}>
               <div className="w-full md:w-1/2 px-3 md:mb-0 relative">
                 <label
@@ -375,7 +375,7 @@ function SignupScreen() {
             </div>
             <div className="items-stretch self-stretch flex flex-col my-4 max-md:max-w-full">
               <button
-                className="text-white text-sm font-semibold leading-5 whitespace-nowrap justify-center items-center bg-violet-500 px-5 py-3 rounded-lg max-md:max-w-full hover:bg-voilet-700"
+                className="text-white text-sm font-semibold leading-5 whitespace-nowrap justify-center items-center bg-violet-500 px-5 py-3 rounded-lg max-md:max-w-full hover:bg-voilet-700 border-none"
                 type="button"
                 onClick={saveUser}
               >

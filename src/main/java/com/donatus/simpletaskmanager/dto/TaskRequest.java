@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class TaskRequest {
     @NotNull(message = "Period should not be empty")
     @Min(message = "Period should be greater than 1 day", value = 1)

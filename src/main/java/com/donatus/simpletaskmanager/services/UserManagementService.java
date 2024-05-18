@@ -4,12 +4,16 @@ import com.donatus.simpletaskmanager.dto.*;
 import com.donatus.simpletaskmanager.exception.*;
 import com.donatus.simpletaskmanager.models.Gender;
 import com.donatus.simpletaskmanager.models.Roles;
+import com.donatus.simpletaskmanager.models.TaskEntity;
 import com.donatus.simpletaskmanager.models.UserEntity;
 import com.donatus.simpletaskmanager.repository.UserRepository;
 import com.donatus.simpletaskmanager.security.JWTGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -115,4 +119,39 @@ public class UserManagementService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    public ResponseEntity<ApiResponse<PaginatedResponse<UserResponse>>> getUsersPaged(int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        Slice<UserEntity> pagedUser = userRepo.findAllByRoles(Roles.USER, pageable);
+        PaginatedResponse<UserResponse> paginatedResponse = new PaginatedResponse<>();
+        ApiResponse<PaginatedResponse<UserResponse>> paginatedApiResponse = new ApiResponse<>();
+
+        if (pagedUser.isEmpty()) {
+            paginatedResponse.setLast(true);
+            paginatedApiResponse.setCode("200");
+            paginatedApiResponse.setDescription("Successful");
+            paginatedApiResponse.setResponseData(paginatedResponse);
+
+            return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
+        }
+        paginatedResponse.setContent(pagedUser.stream()
+                .map(userEntity ->
+                    UserResponse.builder()
+                            .firstName(userEntity.getFirstName())
+                            .lastName(userEntity.getLastName())
+                            .email(userEntity.getEmail())
+                            .build()
+                )
+                .toList());
+        paginatedResponse.setPageNum(pagedUser.getNumber());
+        paginatedResponse.setPageSize(pagedUser.getSize());
+        paginatedResponse.setLast(pagedUser.isLast());
+        paginatedResponse.setTotalElement(pagedUser.getNumberOfElements());
+
+        paginatedApiResponse.setCode("200");
+        paginatedApiResponse.setDescription("Successful");
+        paginatedApiResponse.setResponseData(paginatedResponse);
+
+        return new ResponseEntity<>(paginatedApiResponse, HttpStatus.OK);
+    }
 }

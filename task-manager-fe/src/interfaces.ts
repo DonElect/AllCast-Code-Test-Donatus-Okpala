@@ -7,7 +7,7 @@ export interface Task {
   firstName: string
   lastName: string;
   dateCreated: Date;
-  periodInDays: string;
+  periodInDays: number;
   startDate: Date;
   dateModified: Date;
 }

@@ -19,7 +19,7 @@ function LoginScreen() {
   const [password, setPassword] = useState("");
 
   const homePage = () => {
-    navigate("/home");
+    navigate("/tasks");
   };
 
   const loginUser = async () => {
@@ -59,9 +59,10 @@ function LoginScreen() {
       homePage();
     } catch (err) {
       if (err && err instanceof AxiosError) {
-        if (err.response?.data.responseMessage === "Not verified!") {
+        if(err.response?.data.code === '401'){
+          setError("Unauthorized user")
         }
-        setError(err.response?.data.responseMessage);
+        setError(err.response?.data.description);
       } else if (err && err instanceof Error) setError(err.message);
 
       console.log("Error: ", err);
@@ -90,7 +91,7 @@ function LoginScreen() {
               className="w-full max-w-lg"
             >
               <div className="mt-10">
-                <p className="text-left ">{error}</p>
+                <p className="text-left text-red-700">{error}</p>
               </div>
 
               <div>
@@ -147,7 +148,7 @@ function LoginScreen() {
 
               <div className="items-stretch self-stretch flex flex-col my-8 max-md:max-w-full">
                 <button
-                  className="text-white text-sm font-semibold leading-5 whitespace-nowrap justify-center items-center bg-violet-500 px-5 py-3 rounded-lg max-md:max-w-full hover:bg-violet-700"
+                  className="text-white text-sm font-semibold leading-5 whitespace-nowrap justify-center items-center bg-violet-500 px-5 py-3 rounded-lg max-md:max-w-full hover:bg-violet-700 border-none"
                   type="button"
                   onClick={loginUser}
                 >

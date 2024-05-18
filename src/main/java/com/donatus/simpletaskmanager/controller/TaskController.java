@@ -6,6 +6,8 @@ import com.donatus.simpletaskmanager.services.TaskManagementService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/task-mgmt")
 @RequiredArgsConstructor
 public class TaskController {
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
     private final TaskManagementService taskService;
 
     @PostMapping("/tasks_assign")
@@ -27,7 +30,7 @@ public class TaskController {
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> createAndAssignTask(@RequestParam("pageNum") int pageNum,
+    public ResponseEntity<ApiResponse<PaginatedResponse<TaskResponse>>> getTaskInPages(@RequestParam("pageNum") int pageNum,
                                                                                             @RequestParam("pageSize") int pageSize){
         return taskService.getTasksByPage(pageNum, pageSize);
     }
@@ -35,6 +38,7 @@ public class TaskController {
     @PutMapping("/tasks")
     public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@Valid @RequestBody TaskRequest taskRequest,
                                                                 @RequestParam("taskId") Long taskId){
+        log.info("Task request body: {}", taskRequest);
         return taskService.updateTask(taskRequest, taskId);
     }
 
